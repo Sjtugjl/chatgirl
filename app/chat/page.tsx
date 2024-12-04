@@ -1,20 +1,7 @@
-"use client"
-
-import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import Chat from '@/components/Chat'
 import Navbar from '@/components/Navbar'
-
-function ChatContent() {
-  const searchParams = useSearchParams()
-  const initialMessage = searchParams.get('message')
-
-  return (
-    <div className="h-full max-w-4xl mx-auto">
-      <Chat initialMessage={initialMessage || undefined} />
-    </div>
-  )
-}
+import SearchParamsComponent from './search-params'
 
 export default function ChatPage() {
   return (
@@ -29,7 +16,7 @@ export default function ChatPage() {
             </div>
           </div>
         }>
-          <ChatContent />
+          <SearchParamsComponent />
         </Suspense>
       </main>
     </div>
