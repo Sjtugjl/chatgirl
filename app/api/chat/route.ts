@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Message } from '@/types/chat';
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const API_URL = 'https://api.deepseek.com/v1/chat/completions';
