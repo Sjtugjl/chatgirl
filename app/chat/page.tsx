@@ -1,13 +1,22 @@
+"use client"
+
+import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import Chat from '@/components/Chat'
 import Navbar from '@/components/Navbar'
 
-// 移除 "use client" 指令，使其成为服务器组件
-export default function ChatPage({
-  searchParams,
-}: {
-  searchParams: { message?: string }
-}) {
+function ChatContent() {
+  const searchParams = useSearchParams()
+  const initialMessage = searchParams.get('message')
+
+  return (
+    <div className="h-full max-w-4xl mx-auto">
+      <Chat initialMessage={initialMessage || undefined} />
+    </div>
+  )
+}
+
+export default function ChatPage() {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
       <Navbar showLogin={false} />
@@ -20,9 +29,7 @@ export default function ChatPage({
             </div>
           </div>
         }>
-          <div className="h-full max-w-4xl mx-auto">
-            <Chat initialMessage={searchParams.message} />
-          </div>
+          <ChatContent />
         </Suspense>
       </main>
     </div>
