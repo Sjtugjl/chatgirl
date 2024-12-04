@@ -4,7 +4,7 @@
 这是一个面向女性用户的 AI 对话平台，以温暖贴心的方式提供智能对话服务。项目采用了简约优雅的设计风格，注重情感交互和用户体验。
 
 ## 技术栈
-- Next.js 15
+- Next.js 15.0
 - TypeScript
 - Tailwind CSS
 - DeepSeek API
