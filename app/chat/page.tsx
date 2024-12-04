@@ -1,11 +1,13 @@
-"use client"
-
 import { Suspense } from 'react'
 import Chat from '@/components/Chat'
 import Navbar from '@/components/Navbar'
 
-// 将页面组件设为默认导出
-export default function ChatPage() {
+// 移除 "use client" 指令，使其成为服务器组件
+export default function ChatPage({
+  searchParams,
+}: {
+  searchParams: { message?: string }
+}) {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
       <Navbar showLogin={false} />
@@ -18,24 +20,11 @@ export default function ChatPage() {
             </div>
           </div>
         }>
-          <ClientChat />
+          <div className="h-full max-w-4xl mx-auto">
+            <Chat initialMessage={searchParams.message} />
+          </div>
         </Suspense>
       </main>
-    </div>
-  )
-}
-
-// 创建一个单独的客户端组件来处理 URL 参数
-function ClientChat() {
-  const searchParams = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search) 
-    : new URLSearchParams();
-  
-  const initialMessage = searchParams.get('message')
-
-  return (
-    <div className="h-full max-w-4xl mx-auto">
-      <Chat initialMessage={initialMessage || undefined} />
     </div>
   )
 } 
