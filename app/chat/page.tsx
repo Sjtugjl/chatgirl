@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import Chat from '@/components/Chat'
 import Navbar from '@/components/Navbar'
 import SearchParamsComponent from './search-params'
 

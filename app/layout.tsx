@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Suspense fallback={
           <div className="flex items-center justify-center h-screen">
             <div className="text-center">
