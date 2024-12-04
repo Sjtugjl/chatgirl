@@ -1,21 +1,10 @@
 "use client"
 
 import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Chat from '@/components/Chat'
 import Navbar from '@/components/Navbar'
 
-function ChatContent() {
-  const searchParams = useSearchParams()
-  const initialMessage = searchParams.get('message')
-
-  return (
-    <div className="h-full max-w-4xl mx-auto">
-      <Chat initialMessage={initialMessage || undefined} />
-    </div>
-  )
-}
-
+// 将页面组件设为默认导出
 export default function ChatPage() {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark">
@@ -29,9 +18,24 @@ export default function ChatPage() {
             </div>
           </div>
         }>
-          <ChatContent />
+          <ClientChat />
         </Suspense>
       </main>
+    </div>
+  )
+}
+
+// 创建一个单独的客户端组件来处理 URL 参数
+function ClientChat() {
+  const searchParams = typeof window !== 'undefined' 
+    ? new URLSearchParams(window.location.search) 
+    : new URLSearchParams();
+  
+  const initialMessage = searchParams.get('message')
+
+  return (
+    <div className="h-full max-w-4xl mx-auto">
+      <Chat initialMessage={initialMessage || undefined} />
     </div>
   )
 } 
