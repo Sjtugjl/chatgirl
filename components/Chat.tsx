@@ -72,7 +72,7 @@ export default function Chat({ initialMessage }: ChatProps) {
     };
 
     processInitialMessage();
-  }, [initialMessage, messages]);
+  }, [initialMessage, messages, currentLanguage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

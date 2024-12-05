@@ -9,7 +9,6 @@ export const runtime = 'edge';
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    const currentLanguage = messages[messages.length - 1].language || 'zh-CN';
 
     // 确保系统消息使用正确的语言
     const processedMessages = messages.map((msg: Message) => ({
