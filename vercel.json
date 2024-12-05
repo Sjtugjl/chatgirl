@@ -1,0 +1,10 @@
+{
+  "env": {
+    "DEEPSEEK_API_KEY": "sk-c28711f6ae614fc489b7c81ece38bb35"
+  },
+  "build": {
+    "env": {
+      "DEEPSEEK_API_KEY": "sk-c28711f6ae614fc489b7c81ece38bb35"
+    }
+  }
+} 
