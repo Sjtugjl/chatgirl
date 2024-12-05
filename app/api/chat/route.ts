@@ -66,9 +66,9 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(data);
-    } catch (fetchError) {
+    } catch (fetchError: unknown) {
       clearTimeout(timeoutId);
-      if (fetchError.name === 'AbortError') {
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         return NextResponse.json(
           { error: 'Request timeout - API took too long to respond' },
           { status: 504 }
