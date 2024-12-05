@@ -1,6 +1,7 @@
 export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
+  language?: string;
 }
 
 export interface ChatResponse {

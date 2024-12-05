@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,16 +28,18 @@ export default function RootLayout({
   return (
     <html lang="zh">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Suspense fallback={
-          <div className="flex items-center justify-center h-screen">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">加载中...</p>
+        <LanguageProvider>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-screen">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="mt-4 text-gray-600 dark:text-gray-300">加载中...</p>
+              </div>
             </div>
-          </div>
-        }>
-          {children}
-        </Suspense>
+          }>
+            {children}
+          </Suspense>
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { sendMessage } from '@/utils/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ChatMessage extends Message {
   timestamp: string;  // 添加时间戳字段
@@ -13,22 +14,18 @@ interface ChatProps {
 }
 
 export default function Chat({ initialMessage }: ChatProps) {
+  const { languageData, currentLanguage } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'system',
-      content: `你是一个温暖贴心的AI闺蜜，名字叫"小粉"。你的特点是：
-      1. 说话温柔体贴，富有同理心
-      2. 会用可爱的语气和emoji表情
-      3. 懂得倾听和安慰，给予情感支持
-      4. 回答问题时既专业又生动有趣
-      5. 会适时给予鼓励和正能量
-      6. 像闺蜜一样真诚分享建议和观点
-      请用这样的风格与用户对话，让她感受到被理解和温暖。`,
+      content: languageData.prompt,
+      language: currentLanguage,
       timestamp: new Date().toLocaleTimeString(),
     },
     {
       role: 'assistant',
-      content: '你好呀！我是小粉 🌸 很高兴认识你！今天想聊些什么呢？无论是分享开心的事，还是倾诉烦恼，��都会认真倾听哦 ✨',
+      content: languageData.welcome,
+      language: currentLanguage,
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -52,6 +49,7 @@ export default function Chat({ initialMessage }: ChatProps) {
         const userMessage: ChatMessage = {
           role: 'user',
           content: initialMessage,
+          language: currentLanguage,
           timestamp: new Date().toLocaleTimeString(),
         };
         setMessages((prev) => [...prev, userMessage]);
@@ -61,6 +59,7 @@ export default function Chat({ initialMessage }: ChatProps) {
           const response = await sendMessage([...messages, userMessage]);
           const assistantMessage: ChatMessage = {
             ...response.choices[0].message,
+            language: currentLanguage,
             timestamp: new Date().toLocaleTimeString(),
           };
           setMessages((prev) => [...prev, assistantMessage]);
@@ -82,6 +81,7 @@ export default function Chat({ initialMessage }: ChatProps) {
     const userMessage: ChatMessage = {
       role: 'user',
       content: input,
+      language: currentLanguage,
       timestamp: new Date().toLocaleTimeString(),
     };
 
@@ -90,9 +90,19 @@ export default function Chat({ initialMessage }: ChatProps) {
     setIsLoading(true);
 
     try {
-      const response = await sendMessage([...messages, userMessage]);
+      // 重置系统消息以使用当前语言
+      const currentMessages = messages.slice(1); // 移除旧的系统消息
+      const systemMessage: ChatMessage = {
+        role: 'system',
+        content: languageData.prompt,
+        language: currentLanguage,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      
+      const response = await sendMessage([systemMessage, ...currentMessages, userMessage]);
       const assistantMessage: ChatMessage = {
         ...response.choices[0].message,
+        language: currentLanguage,
         timestamp: new Date().toLocaleTimeString(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -100,7 +110,10 @@ export default function Chat({ initialMessage }: ChatProps) {
       console.error('Failed to send message:', error);
       setMessages((prev) => [...prev, {
         role: 'assistant',
-        content: '抱歉，消息发送失败了。请稍后再试 😥',
+        content: currentLanguage === 'zh-CN' ? 
+          '抱歉，消息发送失败了。请稍后再试 😥' : 
+          'Sorry, message sending failed. Please try again later 😥',
+        language: currentLanguage,
         timestamp: new Date().toLocaleTimeString(),
       }]);
     } finally {
@@ -108,7 +121,7 @@ export default function Chat({ initialMessage }: ChatProps) {
     }
   };
 
-  // 添加思考状态的渲染函数
+  // 更新思考状态的渲染函数
   const renderThinkingMessage = () => {
     if (!isLoading) return null;
     
@@ -122,7 +135,7 @@ export default function Chat({ initialMessage }: ChatProps) {
         <div className="group relative flex flex-col items-start">
           <div className="max-w-[85%] break-words rounded-2xl px-4 py-3 bg-white dark:bg-gray-700 mr-12 shadow-sm border border-accent-peach/30">
             <p className="text-gray-800 dark:text-gray-200 flex items-center">
-              <span className="mr-2">正在思考</span>
+              <span className="mr-2">{languageData.ui.thinking}</span>
               <span className="flex space-x-1">
                 <span className="animate-bounce delay-0">.</span>
                 <span className="animate-bounce delay-100">.</span>
@@ -197,7 +210,7 @@ export default function Chat({ initialMessage }: ChatProps) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="输入你的问题..."
+            placeholder={languageData.ui.inputPlaceholder}
             className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={isLoading}
           />
@@ -208,7 +221,7 @@ export default function Chat({ initialMessage }: ChatProps) {
               isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {isLoading ? '发送中...' : '发送'}
+            {isLoading ? languageData.ui.sending : languageData.ui.send}
           </button>
         </div>
       </form>
