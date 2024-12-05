@@ -4,12 +4,16 @@ import { useState, useRef, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { sendMessage } from '@/utils/api';
 
+interface ChatMessage extends Message {
+  timestamp: string;  // 添加时间戳字段
+}
+
 interface ChatProps {
   initialMessage?: string;
 }
 
 export default function Chat({ initialMessage }: ChatProps) {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'system',
       content: `你是一个温暖贴心的AI闺蜜，名字叫"小粉"。你的特点是：
@@ -20,10 +24,12 @@ export default function Chat({ initialMessage }: ChatProps) {
       5. 会适时给予鼓励和正能量
       6. 像闺蜜一样真诚分享建议和观点
       请用这样的风格与用户对话，让她感受到被理解和温暖。`,
+      timestamp: new Date().toLocaleTimeString(),
     },
     {
       role: 'assistant',
       content: '你好呀！我是小粉 🌸 很高兴认识你！今天想聊些什么呢？无论是分享开心的事，还是倾诉烦恼，我都会认真倾听哦 ✨',
+      timestamp: new Date().toLocaleTimeString(),
     },
   ]);
   const [input, setInput] = useState('');
@@ -43,16 +49,20 @@ export default function Chat({ initialMessage }: ChatProps) {
     const processInitialMessage = async () => {
       if (initialMessage && !initialMessageProcessed.current) {
         initialMessageProcessed.current = true;
-        const userMessage: Message = {
+        const userMessage: ChatMessage = {
           role: 'user',
           content: initialMessage,
+          timestamp: new Date().toLocaleTimeString(),
         };
         setMessages((prev) => [...prev, userMessage]);
         setIsLoading(true);
 
         try {
           const response = await sendMessage([...messages, userMessage]);
-          const assistantMessage: Message = response.choices[0].message;
+          const assistantMessage: ChatMessage = {
+            ...response.choices[0].message,
+            timestamp: new Date().toLocaleTimeString(),
+          };
           setMessages((prev) => [...prev, assistantMessage]);
         } catch (error) {
           console.error('Failed to send initial message:', error);
@@ -69,9 +79,10 @@ export default function Chat({ initialMessage }: ChatProps) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       role: 'user',
       content: input,
+      timestamp: new Date().toLocaleTimeString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -80,22 +91,17 @@ export default function Chat({ initialMessage }: ChatProps) {
 
     try {
       const response = await sendMessage([...messages, userMessage]);
-      if (response.error) {
-        // 显示错误消息
-        setMessages((prev) => [...prev, {
-          role: 'assistant',
-          content: `抱歉，出现了一些问题：${response.error}`
-        }]);
-        return;
-      }
-      const assistantMessage: Message = response.choices[0].message;
+      const assistantMessage: ChatMessage = {
+        ...response.choices[0].message,
+        timestamp: new Date().toLocaleTimeString(),
+      };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      // 添加错误提示消息
       setMessages((prev) => [...prev, {
         role: 'assistant',
-        content: '抱歉，消息发送失败了。请稍后再试 😥'
+        content: '抱歉，消息发送失败了。请稍后再试 😥',
+        timestamp: new Date().toLocaleTimeString(),
       }]);
     } finally {
       setIsLoading(false);
@@ -142,7 +148,7 @@ export default function Chat({ initialMessage }: ChatProps) {
               <div className={`text-xs text-gray-500 mt-1 ${
                 message.role === 'user' ? 'mr-1' : 'ml-1'
               }`}>
-                {new Date().toLocaleTimeString()}
+                {message.timestamp}
               </div>
             </div>
             {message.role === 'user' && (
