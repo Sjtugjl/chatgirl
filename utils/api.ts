@@ -10,11 +10,14 @@ export async function sendMessage(messages: Message[]) {
       body: JSON.stringify({ messages }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      console.error('API error:', data);
+      throw new Error(data.error || 'Failed to send message');
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;

@@ -80,11 +80,23 @@ export default function Chat({ initialMessage }: ChatProps) {
 
     try {
       const response = await sendMessage([...messages, userMessage]);
+      if (response.error) {
+        // 显示错误消息
+        setMessages((prev) => [...prev, {
+          role: 'assistant',
+          content: `抱歉，出现了一些问题：${response.error}`
+        }]);
+        return;
+      }
       const assistantMessage: Message = response.choices[0].message;
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      // 可以添加错误提示UI
+      // 添加错误提示消息
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: '抱歉，消息发送失败了。请稍后再试 😥'
+      }]);
     } finally {
       setIsLoading(false);
     }

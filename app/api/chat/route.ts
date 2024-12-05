@@ -5,8 +5,17 @@ const API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 export async function POST(request: Request) {
   try {
+    if (!DEEPSEEK_API_KEY) {
+      console.error('DEEPSEEK_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'API key is not configured' },
+        { status: 500 }
+      );
+    }
+
     const { messages } = await request.json();
 
+    console.log('Sending request to DeepSeek API...');
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -22,8 +31,9 @@ export async function POST(request: Request) {
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('DeepSeek API error:', data);
       return NextResponse.json(
-        { error: 'API request failed' },
+        { error: `API request failed: ${data.error?.message || response.statusText}` },
         { status: response.status }
       );
     }
@@ -32,7 +42,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error in chat API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error: ' + (error instanceof Error ? error.message : String(error)) },
       { status: 500 }
     );
   }
