@@ -28,7 +28,7 @@ export default function Chat({ initialMessage }: ChatProps) {
     },
     {
       role: 'assistant',
-      content: '你好呀！我是小粉 🌸 很高兴认识你！今天想聊些什么呢？无论是分享开心的事，还是倾诉烦恼，我都会认真倾听哦 ✨',
+      content: '你好呀！我是小粉 🌸 很高兴认识你！今天想聊些什么呢？无论是分享开心的事，还是倾诉烦恼，��都会认真倾听哦 ✨',
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
@@ -108,6 +108,33 @@ export default function Chat({ initialMessage }: ChatProps) {
     }
   };
 
+  // 添加思考状态的渲染函数
+  const renderThinkingMessage = () => {
+    if (!isLoading) return null;
+    
+    return (
+      <div className="flex items-start space-x-4">
+        <div className="flex-shrink-0 w-8 h-8">
+          <div className="w-full h-full rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-sm shadow-md">
+            🌸
+          </div>
+        </div>
+        <div className="group relative flex flex-col items-start">
+          <div className="max-w-[85%] break-words rounded-2xl px-4 py-3 bg-white dark:bg-gray-700 mr-12 shadow-sm border border-accent-peach/30">
+            <p className="text-gray-800 dark:text-gray-200 flex items-center">
+              <span className="mr-2">正在思考</span>
+              <span className="flex space-x-1">
+                <span className="animate-bounce delay-0">.</span>
+                <span className="animate-bounce delay-100">.</span>
+                <span className="animate-bounce delay-200">.</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -160,6 +187,7 @@ export default function Chat({ initialMessage }: ChatProps) {
             )}
           </div>
         ))}
+        {renderThinkingMessage()}
         <div ref={messagesEndRef} />
       </div>
 
